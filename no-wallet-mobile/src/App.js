@@ -21,7 +21,9 @@ class App extends Component {
     nameHexcode: "",
     players: [],
     gameInProgress: false,
-    game: {}
+    game: {},
+    chooseWinner: "",
+    winnerHexcode: ""
   };
 
   async componentDidMount() {
@@ -70,6 +72,23 @@ class App extends Component {
       this.setState({ game });
       console.log('game', game);
     }
+
+    if(this.state.chooseWinner !== prevState.chooseWinner) {
+      const winnerHexcode = web3.eth.abi.encodeFunctionCall({
+        name: "chooseWinner",
+        type: "function",
+        inputs: [{
+          type: 'string',
+          name: '_declaredWinner'
+        }]
+      },[this.state.chooseWinner]);
+
+      this.setState({ winnerHexcode })
+    }
+
+    // if (this.state.game && this.state.game !== prevState.game) {
+    //   const 
+    // }
 
   }
   render() {
@@ -129,7 +148,7 @@ class App extends Component {
         <div>
           <CopyToClipboard text={this.state.nameHexcode}
             onCopy={() => this.setState({copied: true})}>
-            <button className="btn btn-primary">Copy Leaderboard Hexcode</button>
+            <button className="btn btn-primary">Copy Enter Leaderboard Hexcode</button>
           </CopyToClipboard>
         </div>
         <div className="row">
@@ -143,6 +162,41 @@ class App extends Component {
           <CopyToClipboard text={web3.eth.abi.encodeFunctionSignature("createGame()")}
             onCopy={() => this.setState({copied: true})}>
             <button className="btn btn-primary">Copy Create Game Hexcode</button>
+          </CopyToClipboard>
+        </div>
+        <div className="row">
+          <div className="col-xs-12 col-sm-12 col-md-12">
+            <div className="form-group">
+              <label>Add Second Player to Game</label>
+              <p>
+                Note: If there is a bet value, you must send that value in Eth in.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <CopyToClipboard text={web3.eth.abi.encodeFunctionSignature("addSecondPlayerToGame()")}
+            onCopy={() => this.setState({copied: true})}>
+            <button className="btn btn-primary">Copy Add Second Player Game to Hexcode</button>
+          </CopyToClipboard>
+        </div>
+        <div className="row">
+          <div className="col-xs-12 col-sm-12 col-md-12">
+            <div className="form-group">
+              <label>Choose Winner</label>
+              <select value={this.state.chooseWinner} onChange={(event) => this.setState({ chooseWinner: event.target.value}) }>
+                <option value="">--Choose Winner--</option>
+                <option value="first">First Player</option>
+                <option value="second">Second Player</option>
+                <option value="tie">Tie</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div>
+          <CopyToClipboard text={this.state.winnerHexcode}
+            onCopy={() => this.setState({copied: true})}>
+            <button className="btn btn-primary">Choose Winner</button>
           </CopyToClipboard>
         </div>
         {this.state.gameInProgress ? 
